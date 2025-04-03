@@ -1,0 +1,7 @@
+services:
+  api:
+    build: ./back/
+    volumes:
+      - ./back:/back
+    ports:
+     - 8080:8080
