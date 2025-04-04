@@ -1,6 +1,7 @@
 package repository
 
+import "back/domain/entity"
+
 type UserRepository interface {
-	Login(email string, password string) (string, error)
-	SignUp(name string, email string, password string) error
+	FindByEmail(email string) (*entity.UserEntity, error)
 }

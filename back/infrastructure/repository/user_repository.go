@@ -1,21 +1,36 @@
 package repository
 
 import (
-	"gorm.io/gorm"
+	"back/domain/entity"
 	"back/domain/repository"
+	"back/infrastructure/model"
+	"gorm.io/gorm"
+	"fmt"
 )
 
-type userRepository struct{
+type userRepository struct {
 	orm *gorm.DB
 }
+
 func NewUserRepository(orm *gorm.DB) repository.UserRepository {
 	return &userRepository{orm: orm}
 }
 
-func (r *userRepository) Login(email string, password string) (string, error) {
-	// 処理
-}
+func (r *userRepository) FindByEmail(email string) (*entity.UserEntity, error) {
+	var userModel model.UserModel
+	result := r.orm.Where("email = ?", email).First(&userModel)
 
-func (r *userRepository) SignUp(name string, email string, password string) error {
-	// 処理
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to find user: %w", result.Error)
+	}
+
+	userEntity := &entity.UserEntity{
+		ID:    userModel.ID,
+		Email: userModel.Email,
+	}
+
+	return userEntity, nil
 }
