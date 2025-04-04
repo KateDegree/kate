@@ -16,7 +16,7 @@ func main() {
 	}
 
 	// データベース接続
-	db := infrastructure.Gorm()
+	orm := infrastructure.Gorm()
 
 	// 新しいユーザーの作成
 	user := model.User{
@@ -32,7 +32,7 @@ func main() {
 	}
 
 	// データベースにスペースを保存
-	if err := db.Create(&space).Error; err != nil {
+	if err := orm.Create(&space).Error; err != nil {
 		log.Fatalf("Error creating space: %v", err)
 	}
 
@@ -40,7 +40,7 @@ func main() {
 	user.Spaces = append(user.Spaces, space)
 
 	// ユーザーをデータベースに保存（同時に関連するスペースも保存）
-	if err := db.Create(&user).Error; err != nil {
+	if err := orm.Create(&user).Error; err != nil {
 		log.Fatalf("Error creating user: %v", err)
 	}
 

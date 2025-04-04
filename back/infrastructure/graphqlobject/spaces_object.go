@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Spaces(db *gorm.DB) *graphql.Field {
+func SpacesObject(orm *gorm.DB) *graphql.Field {
 	var spacesType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Spaces",
 		Fields: graphql.Fields{
@@ -22,8 +22,8 @@ func Spaces(db *gorm.DB) *graphql.Field {
 	return &graphql.Field{
 		Type: graphql.NewList(spacesType),
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			var spaces []model.Space
-			if err := db.Find(&spaces).Error; err != nil {
+			var spaces []model.SpaceModel
+			if err := orm.Find(&spaces).Error; err != nil {
 				return nil, err
 			}
 			return spaces, nil

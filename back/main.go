@@ -11,14 +11,14 @@ import (
 func main() {
 	e := echo.New()
 	e.POST("/graphql", func(c echo.Context) error {
-		var db = infrastructure.Gorm()
+		var orm = infrastructure.Gorm()
 
 		var schema, _ = graphql.NewSchema(graphql.SchemaConfig{
 			Query: graphql.NewObject(graphql.ObjectConfig{
 				Name: "Query",
 				Fields: graphql.Fields{
-					"users":  graphqlobject.Users(db),
-					"spaces": graphqlobject.Spaces(db),
+					"users":  graphqlobject.UsersObject(orm),
+					"spaces": graphqlobject.SpacesObject(orm),
 				},
 			}),
 		})

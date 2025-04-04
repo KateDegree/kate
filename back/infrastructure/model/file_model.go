@@ -13,7 +13,7 @@ const (
 	FileTypeER    FileType = "er"
 )
 
-type File struct {
+type FileModel struct {
 	gorm.Model
 	SpaceID  uint     `gorm:"not null"`
 	ParentID *uint    `gorm:"index"`

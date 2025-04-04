@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Users(db *gorm.DB) *graphql.Field {
+func UsersObject(orm *gorm.DB) *graphql.Field {
 	var userType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Users",
 		Fields: graphql.Fields{
@@ -26,9 +26,9 @@ func Users(db *gorm.DB) *graphql.Field {
 					},
 				})),
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if user, ok := p.Source.(model.User); ok {
+					if user, ok := p.Source.(model.UserModel); ok {
 						// ここで Preload を使って関連データをロードする
-						if err := db.Preload("Spaces").Find(&user).Error; err != nil {
+						if err := orm.Preload("Spaces").Find(&user).Error; err != nil {
 							return nil, err
 						}
 						return user.Spaces, nil
@@ -42,8 +42,8 @@ func Users(db *gorm.DB) *graphql.Field {
 	return &graphql.Field{
 		Type: graphql.NewList(userType),
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			var users []model.User
-			if err := db.Preload("Spaces").Find(&users).Error; err != nil {
+			var users []model.UserModel
+			if err := orm.Preload("Spaces").Find(&users).Error; err != nil {
 				return nil, err
 			}
 			return users, nil

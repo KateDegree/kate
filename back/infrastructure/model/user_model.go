@@ -5,9 +5,13 @@ import (
 	"time"
 )
 
+func (UserModel) TableName() string {
+	return "users" // テーブル名を指定
+}
+
 // gorm.Modelを使用しないこと
 // jsonタグを付けること
-type User struct {
+type UserModel struct {
 	ID        uint           `gorm:"primaryKey" json:"id"`
 	CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
@@ -18,6 +22,6 @@ type User struct {
 	Password string `gorm:"size:255;not null" json:"password"`
 
 	// リレーションは使う際にコメントアウトを解除する
-	Spaces []Space `gorm:"many2many:space_users;" json:"spaces"`
+	Spaces []SpaceModel `gorm:"many2many:space_users;foreignKey:ID;joinForeignKey:user_id;joinReferences:space_id" json:"spaces"`
 	// AccessTokens []AccessToken `gorm:"foreignKey:UserID" json:"access_tokens"`
 }

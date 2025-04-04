@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type AccessToken struct {
+type AccessTokenModel struct {
 	gorm.Model
 	UserID    uint      `gorm:"not null"`
 	Token     string    `gorm:"not null"`

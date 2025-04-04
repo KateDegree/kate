@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Directory struct {
+type DirectoryModel struct {
 	gorm.Model
 	SpaceID  uint   `gorm:"not null"`
 	ParentID *uint  `gorm:"index"`
