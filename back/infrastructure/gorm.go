@@ -2,7 +2,6 @@ package infrastructure
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
@@ -10,11 +9,6 @@ import (
 )
 
 func Gorm() *gorm.DB {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_DATABASE")

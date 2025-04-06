@@ -3,6 +3,7 @@ module back
 go 1.24.0
 
 require (
+	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
 	github.com/golang-migrate/migrate/v4 v4.18.2 // indirect
 	github.com/graphql-go/graphql v0.8.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect

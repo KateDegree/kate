@@ -1,4 +1,4 @@
-package graphqlobject
+package query
 
 import (
 	"back/infrastructure/model"
@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func SpacesObject(orm *gorm.DB) *graphql.Field {
+func SpacesField(orm *gorm.DB) *graphql.Field {
 	var spacesType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Spaces",
 		Fields: graphql.Fields{

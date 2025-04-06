@@ -3,5 +3,5 @@ package repository
 import "back/domain/entity"
 
 type AccessTokenRepository interface {
-	Create(userId string) (*entity.AccessTokenEntity, error)
+	Create(userId uint) (*entity.AccessTokenEntity, error)
 }

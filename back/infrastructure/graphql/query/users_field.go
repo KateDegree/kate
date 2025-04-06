@@ -1,4 +1,4 @@
-package graphqlobject
+package query
 
 import (
 	"back/infrastructure/model" //TODO: domain/entityから取得するようにする
@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func UsersObject(orm *gorm.DB) *graphql.Field {
+func UsersField(orm *gorm.DB) *graphql.Field {
 	var userType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Users",
 		Fields: graphql.Fields{
