@@ -1,14 +1,14 @@
 package main
 
 import (
-	"github.com/graphql-go/graphql"
-	"github.com/labstack/echo/v4"
-	"net/http"
 	"back/infrastructure"
-	"back/infrastructure/graphql/query"
 	"back/infrastructure/graphql/mutation"
-	"log"
+	"back/infrastructure/graphql/query"
+	"github.com/graphql-go/graphql"
 	"github.com/joho/godotenv"
+	"github.com/labstack/echo/v4"
+	"log"
+	"net/http"
 )
 
 func main() {

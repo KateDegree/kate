@@ -4,8 +4,8 @@ import (
 	"back/domain/entity"
 	"back/domain/repository"
 	"back/infrastructure/model"
-	"gorm.io/gorm"
 	"fmt"
+	"gorm.io/gorm"
 )
 
 type userRepository struct {
@@ -28,8 +28,8 @@ func (r *userRepository) FindByEmail(email string) (*entity.UserEntity, error) {
 	}
 
 	userEntity := &entity.UserEntity{
-		ID:    userModel.ID,
-		Email: userModel.Email,
+		ID:       userModel.ID,
+		Email:    userModel.Email,
 		Password: userModel.Password,
 	}
 

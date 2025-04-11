@@ -1,9 +1,9 @@
 package usecase
 
 import (
+	"back/domain/repository"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
-	"back/domain/repository"
 )
 
 type loginUsecase struct {

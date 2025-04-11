@@ -20,7 +20,7 @@ func UsersField(orm *gorm.DB) *graphql.Field {
 				Type: graphql.NewList(graphql.NewObject(graphql.ObjectConfig{
 					Name: "Space",
 					Fields: graphql.Fields{
-						"id": &graphql.Field{Type: graphql.String},
+						"id":   &graphql.Field{Type: graphql.String},
 						"name": &graphql.Field{Type: graphql.String},
 						"type": &graphql.Field{Type: graphql.String},
 					},

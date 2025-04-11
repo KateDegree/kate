@@ -19,6 +19,6 @@ type UserModel struct {
 	Email    string `gorm:"size:255;unique;not null" json:"email"`
 	Password string `gorm:"size:255;not null" json:"password"`
 
-	Spaces []SpaceModel `gorm:"many2many:space_users;foreignKey:ID;joinForeignKey:user_id;joinReferences:space_id" json:"spaces"`
+	Spaces       []SpaceModel       `gorm:"many2many:space_users;foreignKey:ID;joinForeignKey:user_id;joinReferences:space_id" json:"spaces"`
 	AccessTokens []AccessTokenModel `gorm:"foreignKey:UserID" json:"access_tokens"`
 }

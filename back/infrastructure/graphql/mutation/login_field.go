@@ -1,16 +1,16 @@
 package mutation
 
 import (
+	"back/infrastructure/repository"
+	"back/interface/validator"
+	"back/usecase"
 	"github.com/graphql-go/graphql"
 	"gorm.io/gorm"
-	"back/infrastructure/repository"
-	"back/usecase"
-	"back/interface/validator"
 )
 
 type LoginResponse struct {
-	AccessToken string `json:"accessToken"`
-	Success     bool   `json:"success"`
+	AccessToken string   `json:"accessToken"`
+	Success     bool     `json:"success"`
 	Messages    []string `json:"messages"`
 }
 

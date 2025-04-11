@@ -1,13 +1,13 @@
 package repository
 
 import (
-	"back/infrastructure/model"
 	"back/domain/entity"
 	"back/domain/repository"
+	"back/infrastructure/model"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
-	"time"
 	"os"
+	"time"
 )
 
 type accessTokenRepository struct {
