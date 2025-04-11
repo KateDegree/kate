@@ -5,18 +5,16 @@ import (
 	"gorm.io/gorm"
 	"back/infrastructure/repository"
 	"back/usecase"
+	"back/interface/validator"
 )
 
-// LoginResponse はログイン処理の結果を表す構造体です。
 type LoginResponse struct {
 	AccessToken string `json:"accessToken"`
 	Success     bool   `json:"success"`
-	Messages    string `json:"messages"`
+	Messages    []string `json:"messages"`
 }
 
-// TODO: interfaceを使って入出力を管理する
 func LoginField(orm *gorm.DB) *graphql.Field {
-	// LoginResponse 用の GraphQL オブジェクトを定義
 	loginResponseType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "LoginResponse",
 		Fields: graphql.Fields{
@@ -27,48 +25,51 @@ func LoginField(orm *gorm.DB) *graphql.Field {
 				Type: graphql.Boolean,
 			},
 			"messages": &graphql.Field{
-				Type: graphql.String,
+				Type: graphql.NewList(graphql.String),
 			},
 		},
 	})
 
 	return &graphql.Field{
-		Type: loginResponseType,  // 戻り値の型を LoginResponse に設定
+		Type: loginResponseType,
 		Args: graphql.FieldConfigArgument{
 			"email": &graphql.ArgumentConfig{
-				Type: graphql.String,  // 引数としてメールアドレスを受け取る
+				Type: graphql.String,
 			},
 			"password": &graphql.ArgumentConfig{
-				Type: graphql.String,  // 引数としてパスワードを受け取る
+				Type: graphql.String,
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			// 引数を取得
 			email := p.Args["email"].(string)
 			password := p.Args["password"].(string)
 
-			// ユースケースのインスタンス化
+			errorMessages := validator.LoginValidator(email, password)
+			if len(errorMessages) > 0 {
+				return LoginResponse{
+					AccessToken: "",
+					Success:     false,
+					Messages:    errorMessages,
+				}, nil
+			}
+
 			loginUsecase := usecase.NewLoginUsecase(
 				repository.NewUserRepository(orm),
 				repository.NewAccessTokenRepository(orm),
 			)
-
-			// ログイン処理を実行
 			loginUsecaseResponse, err := loginUsecase.Execute(email, password)
 			if err != nil {
-				// エラーがあれば、エラーメッセージと失敗フラグを返す
 				return LoginResponse{
 					AccessToken: "",
 					Success:     false,
-					Messages:    err.Error(),
+					Messages:    []string{"エラーが発生しました"},
 				}, nil
 			}
 
-			// ログイン成功時のレスポンスを返す
 			return LoginResponse{
 				AccessToken: loginUsecaseResponse.AccessToken,
 				Success:     true,
-				Messages:    "ログイン成功",
+				Messages:    []string{"ログイン成功"},
 			}, nil
 		},
 	}

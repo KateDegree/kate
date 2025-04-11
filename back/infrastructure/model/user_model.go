@@ -6,11 +6,9 @@ import (
 )
 
 func (UserModel) TableName() string {
-	return "users" // テーブル名を指定
+	return "users"
 }
 
-// gorm.Modelを使用しないこと
-// jsonタグを付けること
 type UserModel struct {
 	ID        uint           `gorm:"primaryKey" json:"id"`
 	CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`

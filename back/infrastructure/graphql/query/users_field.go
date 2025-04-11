@@ -27,7 +27,6 @@ func UsersField(orm *gorm.DB) *graphql.Field {
 				})),
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if user, ok := p.Source.(model.UserModel); ok {
-						// ここで Preload を使って関連データをロードする
 						if err := orm.Preload("Spaces").Find(&user).Error; err != nil {
 							return nil, err
 						}
