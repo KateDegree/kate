@@ -1,6 +1,7 @@
 package mutation
 
 import (
+	"back/domain/entity"
 	"back/infrastructure/repository"
 	"back/interface/validator"
 	"back/usecase"
@@ -57,12 +58,16 @@ func LoginField(orm *gorm.DB) *graphql.Field {
 				repository.NewUserRepository(orm),
 				repository.NewAccessTokenRepository(orm),
 			)
-			loginUsecaseResponse, err := loginUsecase.Execute(email, password)
+			loginUsecaseResponse, err := loginUsecase.Execute(
+				entity.UserEntity{
+					Email:    email,
+					Password: password,
+				})
 			if err != nil {
 				return LoginResponse{
 					AccessToken: "",
 					Success:     false,
-					Messages:    []string{"エラーが発生しました"},
+					Messages:    []string{err.Message},
 				}, nil
 			}
 

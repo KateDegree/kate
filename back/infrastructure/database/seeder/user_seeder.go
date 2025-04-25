@@ -3,11 +3,15 @@ package main
 import (
 	"back/infrastructure"
 	"back/infrastructure/model"
+	"back/pkg"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 )
 
 func main() {
+	// .envファイルから環境変数を読み込む
+	pkg.LoadEnv()
+
 	plainPassword := "Kate0418"
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
 	if err != nil {
@@ -16,13 +20,13 @@ func main() {
 
 	orm := infrastructure.Gorm()
 
-	user := model.User{
+	user := model.UserModel{
 		Name:     "nakao",
 		Email:    "nakao@gmail.com",
 		Password: string(hashedPassword),
 	}
 
-	space := model.Space{
+	space := model.SpaceModel{
 		Name: "テストスペース",
 		Type: "private",
 	}

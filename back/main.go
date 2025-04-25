@@ -4,42 +4,41 @@ import (
 	"back/infrastructure"
 	"back/infrastructure/graphql/mutation"
 	"back/infrastructure/graphql/query"
+	"back/pkg"
 	"github.com/graphql-go/graphql"
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
-	"log"
 	"net/http"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
+	// .envファイルから環境変数を読み込む
+	pkg.LoadEnv()
+
+	// GORMによるDB接続インスタンスの生成
+	var orm = infrastructure.Gorm()
+
+	// GraphQLスキーマの構築
+	var schema, _ = graphql.NewSchema(graphql.SchemaConfig{
+		Query: graphql.NewObject(graphql.ObjectConfig{
+			Name: "Query",
+			Fields: graphql.Fields{
+				"users":  query.UsersField(orm),
+				"spaces": query.SpacesField(orm),
+			},
+		}),
+		Mutation: graphql.NewObject(graphql.ObjectConfig{
+			Name: "Mutation",
+			Fields: graphql.Fields{
+				"login": mutation.LoginField(orm),
+			},
+		}),
+	})
+	var params struct {
+		Query string `json:"query"`
 	}
 
 	e := echo.New()
 	e.POST("/graphql", func(c echo.Context) error {
-		var orm = infrastructure.Gorm()
-
-		var schema, _ = graphql.NewSchema(graphql.SchemaConfig{
-			Query: graphql.NewObject(graphql.ObjectConfig{
-				Name: "Query",
-				Fields: graphql.Fields{
-					"users":  query.UsersField(orm),
-					"spaces": query.SpacesField(orm),
-				},
-			}),
-			Mutation: graphql.NewObject(graphql.ObjectConfig{
-				Name: "Mutation",
-				Fields: graphql.Fields{
-					"login": mutation.LoginField(orm),
-				},
-			}),
-		})
-
-		var params struct {
-			Query string `json:"query"`
-		}
 		if err := c.Bind(&params); err != nil {
 			return err
 		}

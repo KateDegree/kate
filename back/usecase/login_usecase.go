@@ -1,9 +1,10 @@
 package usecase
 
 import (
+	"back/domain/entity"
 	"back/domain/repository"
-	"fmt"
-	"golang.org/x/crypto/bcrypt"
+	"back/domain/service"
+	"back/pkg"
 )
 
 type loginUsecase struct {
@@ -19,39 +20,45 @@ func NewLoginUsecase(userRepository repository.UserRepository, accessTokenReposi
 }
 
 type loginUsecaseResponse struct {
-	AccessToken string `json:"access_token,omitempty"`
-	Message     string `json:"message"`
+	AccessToken string `json:"access_token"`
 }
 
-func (u *loginUsecase) Execute(email, password string) (loginUsecaseResponse, error) {
-	userEntity, err := u.userRepository.FindByEmail(email)
+func (u *loginUsecase) Execute(ue entity.UserEntity) (*loginUsecaseResponse, *pkg.Error) {
+	userEntity, err := u.userRepository.FindByEmail(ue.Email)
 	if err != nil {
-		return loginUsecaseResponse{
+		return nil, &pkg.Error{
 			Message: "ログイン処理中に問題が発生しました。時間をおいて再試行してください。",
-		}, fmt.Errorf("failed to find user: %w", err)
+			Code:    500,
+			Cause:   err,
+		}
 	}
 	if userEntity == nil {
-		return loginUsecaseResponse{
+		return nil, &pkg.Error{
 			Message: "メールアドレスまたはパスワードが正しくありません。",
-		}, fmt.Errorf("user not found")
+			Code:    400,
+			Cause:   err,
+		}
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(userEntity.Password), []byte(password))
+	err = service.NewAuthService().ValidatePassword(userEntity.Password, ue.Password)
 	if err != nil {
-		return loginUsecaseResponse{
+		return nil, &pkg.Error{
 			Message: "メールアドレスまたはパスワードが正しくありません。",
-		}, fmt.Errorf("invalid password: %w", err)
+			Code:    400,
+			Cause:   err,
+		}
 	}
 
 	accessTokenEntity, err := u.accessTokenRepository.Create(userEntity.ID)
 	if err != nil {
-		return loginUsecaseResponse{
+		return nil, &pkg.Error{
 			Message: "ログイン処理中に問題が発生しました。時間をおいて再試行してください。",
-		}, fmt.Errorf("failed to create access token: %w", err)
+			Code:    500,
+			Cause:   err,
+		}
 	}
 
-	return loginUsecaseResponse{
+	return &loginUsecaseResponse{
 		AccessToken: accessTokenEntity.Token,
-		Message:     "ログインに成功しました。",
 	}, nil
 }
