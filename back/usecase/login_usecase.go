@@ -24,7 +24,7 @@ type loginUsecaseResponse struct {
 }
 
 func (u *loginUsecase) Execute(ue entity.UserEntity) (*loginUsecaseResponse, *pkg.Error) {
-	userEntity, err := u.userRepository.FindByEmail(ue.Email)
+	userEntity, err := u.userRepository.FindByAccountCode(ue.AccountCode)
 	if err != nil {
 		return nil, &pkg.Error{
 			Message: "ログイン処理中に問題が発生しました。時間をおいて再試行してください。",

@@ -34,7 +34,7 @@ func LoginField(orm *gorm.DB) *graphql.Field {
 	return &graphql.Field{
 		Type: loginResponseType,
 		Args: graphql.FieldConfigArgument{
-			"email": &graphql.ArgumentConfig{
+			"accountCode": &graphql.ArgumentConfig{
 				Type: graphql.String,
 			},
 			"password": &graphql.ArgumentConfig{
@@ -42,10 +42,10 @@ func LoginField(orm *gorm.DB) *graphql.Field {
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			email := p.Args["email"].(string)
+			accountCode := p.Args["accountCode"].(string)
 			password := p.Args["password"].(string)
 
-			errorMessages := validator.LoginValidator(email, password)
+			errorMessages := validator.LoginValidator(accountCode, password)
 			if len(errorMessages) > 0 {
 				return LoginResponse{
 					AccessToken: "",
@@ -60,8 +60,8 @@ func LoginField(orm *gorm.DB) *graphql.Field {
 			)
 			loginUsecaseResponse, err := loginUsecase.Execute(
 				entity.UserEntity{
-					Email:    email,
-					Password: password,
+					AccountCode: accountCode,
+					Password:    password,
 				})
 			if err != nil {
 				return LoginResponse{

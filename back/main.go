@@ -3,7 +3,7 @@ package main
 import (
 	"back/infrastructure"
 	"back/infrastructure/graphql/mutation"
-	"back/infrastructure/graphql/query"
+	// "back/infrastructure/graphql/query"
 	"back/pkg"
 	"github.com/graphql-go/graphql"
 	"github.com/labstack/echo/v4"
@@ -20,10 +20,10 @@ func main() {
 	// GraphQLスキーマの構築
 	var schema, _ = graphql.NewSchema(graphql.SchemaConfig{
 		Query: graphql.NewObject(graphql.ObjectConfig{
-			Name: "Query",
+			Name:   "Query",
 			Fields: graphql.Fields{
-				"users":  query.UsersField(orm),
-				"spaces": query.SpacesField(orm),
+				// "users":  query.UsersField(orm),
+				// "spaces": query.SpacesField(orm),
 			},
 		}),
 		Mutation: graphql.NewObject(graphql.ObjectConfig{

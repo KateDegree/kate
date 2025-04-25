@@ -5,20 +5,19 @@ import (
 )
 
 type Request struct {
-	Email    string `validate:"required,email"`
-	Password string `validate:"required"`
+	AccountCode string `validate:"required"`
+	Password    string `validate:"required"`
 }
 
-func LoginValidator(email, password string) []string {
+func LoginValidator(accountCode, password string) []string {
 	request := Request{
-		Email:    email,
-		Password: password,
+		AccountCode: accountCode,
+		Password:    password,
 	}
 
 	messages := map[string]map[string]string{
-		"Email": {
-			"required": "メールアドレスは必須です。",
-			"email":    "有効なメールアドレスを入力してください。",
+		"AccountCode": {
+			"required": "アカウントコードは必須です。",
 		},
 		"Password": {
 			"required": "パスワードは必須です。",

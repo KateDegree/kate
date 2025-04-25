@@ -1,11 +1,11 @@
 package entity
 
 type UserEntity struct {
-	ID        uint   `json:"id"`
-	Name      string `json:"name"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-	DeletedAt string `json:"deleted_at"`
+	ID          uint   `json:"id"`
+	Name        string `json:"name"`
+	AccountCode string `json:"accountCode"`
+	Password    string `json:"password"`
+	CreatedAt   string `json:"createdAt"`
+	UpdatedAt   string `json:"updatedAt"`
+	DeletedAt   string `json:"deletedAt"`
 }

@@ -15,10 +15,10 @@ type UserModel struct {
 	UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 
-	Name     string `gorm:"size:255;not null" json:"name"`
-	Email    string `gorm:"size:255;unique;not null" json:"email"`
-	Password string `gorm:"size:255;not null" json:"password"`
+	Name        string `gorm:"size:255;not null" json:"name"`
+	AccountCode string `gorm:"size:255;unique;not null" json:"account_code"`
+	Password    string `gorm:"size:255;not null" json:"password"`
 
-	Spaces       []SpaceModel       `gorm:"many2many:space_users;foreignKey:ID;joinForeignKey:user_id;joinReferences:space_id" json:"spaces"`
+	// Group       []GroupModel       `gorm:"many2many:group_users;foreignKey:ID;joinForeignKey:user_id;joinReferences:group_id" json:"groups"`
 	AccessTokens []AccessTokenModel `gorm:"foreignKey:UserID" json:"access_tokens"`
 }

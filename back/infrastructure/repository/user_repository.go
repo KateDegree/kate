@@ -16,9 +16,9 @@ func NewUserRepository(orm *gorm.DB) repository.UserRepository {
 	return &userRepository{orm: orm}
 }
 
-func (r *userRepository) FindByEmail(email string) (*entity.UserEntity, error) {
+func (r *userRepository) FindByAccountCode(accountCode string) (*entity.UserEntity, error) {
 	var userModel model.UserModel
-	result := r.orm.Where("email = ?", email).First(&userModel)
+	result := r.orm.Where("account_code = ?", accountCode).First(&userModel)
 
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
@@ -28,9 +28,9 @@ func (r *userRepository) FindByEmail(email string) (*entity.UserEntity, error) {
 	}
 
 	userEntity := &entity.UserEntity{
-		ID:       userModel.ID,
-		Email:    userModel.Email,
-		Password: userModel.Password,
+		ID:          userModel.ID,
+		AccountCode: userModel.AccountCode,
+		Password:    userModel.Password,
 	}
 
 	return userEntity, nil
