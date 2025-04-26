@@ -29,14 +29,12 @@ func (u *loginUsecase) Execute(ue entity.UserEntity) (*loginUsecaseResponse, *pk
 		return nil, &pkg.Error{
 			Message: "ログイン処理中に問題が発生しました。時間をおいて再試行してください。",
 			Code:    500,
-			Cause:   err,
 		}
 	}
 	if userEntity == nil {
 		return nil, &pkg.Error{
 			Message: "メールアドレスまたはパスワードが正しくありません。",
 			Code:    400,
-			Cause:   err,
 		}
 	}
 
@@ -45,7 +43,6 @@ func (u *loginUsecase) Execute(ue entity.UserEntity) (*loginUsecaseResponse, *pk
 		return nil, &pkg.Error{
 			Message: "メールアドレスまたはパスワードが正しくありません。",
 			Code:    400,
-			Cause:   err,
 		}
 	}
 
@@ -54,7 +51,6 @@ func (u *loginUsecase) Execute(ue entity.UserEntity) (*loginUsecaseResponse, *pk
 		return nil, &pkg.Error{
 			Message: "ログイン処理中に問題が発生しました。時間をおいて再試行してください。",
 			Code:    500,
-			Cause:   err,
 		}
 	}
 

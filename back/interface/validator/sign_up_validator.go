@@ -4,18 +4,23 @@ import (
 	"back/pkg"
 )
 
-type LoginRequest struct {
+type SignUpRequest struct {
+	Name        string `validate:"required"`
 	AccountCode string `validate:"required"`
 	Password    string `validate:"required"`
 }
 
-func LoginValidator(accountCode, password string) []string {
-	request := LoginRequest{
+func SignUpValidator(name, accountCode, password string) []string {
+	request := SignUpRequest{
+		Name:        name,
 		AccountCode: accountCode,
 		Password:    password,
 	}
 
 	messages := map[string]map[string]string{
+		"Name": {
+			"required": "名前は必須です。",
+		},
 		"AccountCode": {
 			"required": "アカウントコードは必須です。",
 		},
@@ -24,5 +29,6 @@ func LoginValidator(accountCode, password string) []string {
 		},
 	}
 
+	// バリデーション実行
 	return pkg.Validator(request, messages)
 }

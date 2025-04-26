@@ -29,7 +29,8 @@ func main() {
 		Mutation: graphql.NewObject(graphql.ObjectConfig{
 			Name: "Mutation",
 			Fields: graphql.Fields{
-				"login": mutation.LoginField(orm),
+				"login":  mutation.LoginField(orm),
+				"signUp": mutation.SignUpField(orm),
 			},
 		}),
 	})

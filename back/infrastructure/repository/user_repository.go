@@ -35,3 +35,22 @@ func (r *userRepository) FindByAccountCode(accountCode string) (*entity.UserEnti
 
 	return userEntity, nil
 }
+
+func (r *userRepository) Create(user *entity.UserEntity) (*entity.UserEntity, error) {
+	userModel := &model.UserModel{
+		Name:        user.Name,
+		AccountCode: user.AccountCode,
+		Password:    user.Password,
+	}
+
+	if err := r.orm.Create(userModel).Error; err != nil {
+		return nil, err
+	}
+
+	return &entity.UserEntity{
+		ID:          userModel.ID,
+		Name:        userModel.Name,
+		AccountCode: userModel.AccountCode,
+		Password:    userModel.Password,
+	}, nil
+}
