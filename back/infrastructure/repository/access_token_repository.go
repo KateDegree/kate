@@ -4,6 +4,7 @@ import (
 	"back/domain/entity"
 	"back/domain/repository"
 	"back/infrastructure/model"
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
 	"os"
@@ -46,4 +47,25 @@ func (r *accessTokenRepository) Create(userId uint) (*entity.AccessTokenEntity, 
 		Token:     accessToken.Token,
 		ExpiresAt: accessToken.ExpiresAt,
 	}, nil
+}
+
+func (r *accessTokenRepository) FindByToken(token string) (*entity.AccessTokenEntity, error) {
+	var accessTokenModel model.AccessTokenModel
+	result := r.orm.Where("token = ?", token).First(&accessTokenModel)
+
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to find access token: %w", result.Error)
+	}
+
+	accessTokenEntity := &entity.AccessTokenEntity{
+		ID:        accessTokenModel.ID,
+		UserID:    accessTokenModel.UserID,
+		Token:     accessTokenModel.Token,
+		ExpiresAt: accessTokenModel.ExpiresAt,
+	}
+
+	return accessTokenEntity, nil
 }

@@ -4,12 +4,28 @@ import (
 	"back/domain/repository"
 	"golang.org/x/crypto/bcrypt"
 	"regexp"
+	"time"
 )
 
 type authService struct{}
 
 func NewAuthService() *authService {
 	return &authService{}
+}
+
+// トークン検証
+func (s *authService) ValidateToken(token string, tokenRepository repository.AccessTokenRepository) bool {
+	tokenEntity, err := tokenRepository.FindByToken(token)
+	if err != nil {
+		return false
+	}
+	if tokenEntity == nil {
+		return false
+	}
+	if tokenEntity.ExpiresAt.Before(time.Now()) {
+		return false
+	}
+	return true
 }
 
 // ログイン時のパスワード検証
