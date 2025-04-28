@@ -2,7 +2,8 @@ package main
 
 import (
 	"back/infrastructure"
-	"back/infrastructure/graphql/schema"
+	"back/infrastructure/graphql/mutation"
+	"back/infrastructure/middleware"
 	"back/pkg"
 	"github.com/graphql-go/graphql"
 	"github.com/labstack/echo/v4"
@@ -13,18 +14,36 @@ func main() {
 	pkg.LoadEnv()
 	orm := infrastructure.Gorm()
 
-	privateSchema, err := schema.PrivateSchema(orm)
-	if err != nil {
-		panic(err)
-	}
-	publicSchema, err := schema.PublicSchema(orm)
+	// スキーマ定義
+	schema, err := graphql.NewSchema(graphql.SchemaConfig{
+		Query: graphql.NewObject(graphql.ObjectConfig{
+			Name: "Query",
+			Fields: graphql.Fields{
+				"_dummy": &graphql.Field{Type: graphql.String},
+			},
+		}),
+		Mutation: graphql.NewObject(graphql.ObjectConfig{
+			Name: "Mutation",
+			Fields: graphql.Fields{
+				"login":       mutation.LoginField(orm),
+				"signUp":      mutation.SignUpField(orm),
+				"createGroup": mutation.CreateGroupField(orm),
+			},
+		}),
+	})
 	if err != nil {
 		panic(err)
 	}
 
-	// GraphQLのリクエストを処理する共通ハンドラー
-	handleGraphQL := func(s graphql.Schema) echo.HandlerFunc {
-		return func(c echo.Context) error {
+	e := echo.New()
+
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return middleware.AuthMiddleware(orm, next)
+	})
+
+	e.POST(
+		"/graphql",
+		func(c echo.Context) error {
 			var params struct {
 				Query string `json:"query"`
 			}
@@ -32,16 +51,12 @@ func main() {
 				return err
 			}
 			result := graphql.Do(graphql.Params{
-				Schema:        s,
+				Schema:        schema,
 				RequestString: params.Query,
 			})
 			return c.JSON(http.StatusOK, result)
-		}
-	}
-
-	e := echo.New()
-	e.POST("/graphql/public", handleGraphQL(publicSchema))
-	e.POST("/graphql/private", handleGraphQL(privateSchema))
+		},
+	)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

@@ -34,6 +34,7 @@ func (s *authService) ValidatePassword(hashedPassword, plainPassword string) err
 }
 
 // アカウントコードの規則検証
+// TODO: user_service.go に移動
 func (s *authService) IsValidAccountCode(code string) bool {
 	re := regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 	return re.MatchString(code)
