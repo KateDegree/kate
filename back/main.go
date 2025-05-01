@@ -53,6 +53,7 @@ func main() {
 			result := graphql.Do(graphql.Params{
 				Schema:        schema,
 				RequestString: params.Query,
+				Context:       c.Request().Context(),
 			})
 			return c.JSON(http.StatusOK, result)
 		},

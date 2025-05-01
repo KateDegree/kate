@@ -5,6 +5,7 @@ import (
 	"back/domain/repository"
 	"back/infrastructure/model"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -37,10 +38,14 @@ func (r *userRepository) FindByAccountCode(accountCode string) (*entity.UserEnti
 }
 
 func (r *userRepository) Create(user *entity.UserEntity) (*entity.UserEntity, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, fmt.Errorf("failed to hash password: %w", err)
+	}
 	userModel := &model.UserModel{
 		Name:        user.Name,
 		AccountCode: user.AccountCode,
-		Password:    user.Password,
+		Password:    string(hashedPassword),
 	}
 
 	if err := r.orm.Create(userModel).Error; err != nil {
@@ -51,6 +56,24 @@ func (r *userRepository) Create(user *entity.UserEntity) (*entity.UserEntity, er
 		ID:          userModel.ID,
 		Name:        userModel.Name,
 		AccountCode: userModel.AccountCode,
-		Password:    userModel.Password,
 	}, nil
+}
+
+func (r *userRepository) FindByToken(token string) (*entity.UserEntity, error) {
+	var tokenModel model.AccessTokenModel
+	result := r.orm.Preload("User").Where("token = ?", token).First(&tokenModel)
+
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to find user by token: %w", result.Error)
+	}
+
+	userEntity := &entity.UserEntity{
+		ID:          tokenModel.User.ID,
+		AccountCode: tokenModel.User.AccountCode,
+	}
+
+	return userEntity, nil
 }

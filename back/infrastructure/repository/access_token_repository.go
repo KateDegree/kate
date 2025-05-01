@@ -6,6 +6,7 @@ import (
 	"back/infrastructure/model"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"os"
 	"time"
@@ -24,6 +25,7 @@ func (r *accessTokenRepository) Create(userId uint) (*entity.AccessTokenEntity, 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userId,
 		"exp":     time.Now().Add(24 * time.Hour).Unix(),
+		"jti":     uuid.New().String(),
 	})
 
 	signedToken, err := token.SignedString(jwtSecret)

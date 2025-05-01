@@ -6,6 +6,7 @@ import (
 	"back/interface/validator"
 	"back/usecase"
 	"github.com/graphql-go/graphql"
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
@@ -33,6 +34,11 @@ func CreateGroupField(orm *gorm.DB) *graphql.Field {
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			authUser, ok := p.Context.Value("authUser").(*entity.UserEntity)
+			if !ok || authUser == nil {
+				return nil, echo.NewHTTPError(401, "認証エラー: ユーザーが見つかりません")
+			}
+
 			name := p.Args["name"].(string)
 			errorMessages := validator.CreateGroupValidator(name)
 			if len(errorMessages) > 0 {
@@ -47,7 +53,7 @@ func CreateGroupField(orm *gorm.DB) *graphql.Field {
 			)
 			_, err := createGroupUsecase.Execute(entity.GroupEntity{
 				Name: name,
-			}, 1) // TODO: 認証トークンからログインユーザーのIDを使用したい
+			}, authUser.ID)
 			if err != nil {
 				return CreateGroupResponse{
 					Success:  false,

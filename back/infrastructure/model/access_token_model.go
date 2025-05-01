@@ -18,4 +18,6 @@ type AccessTokenModel struct {
 	UserID    uint      `gorm:"not null" json:"user_id"`
 	Token     string    `gorm:"not null" json:"token"`
 	ExpiresAt time.Time `gorm:"not null" json:"expires_at"`
+
+	User UserModel `gorm:"foreignKey:UserID" json:"user"`
 }

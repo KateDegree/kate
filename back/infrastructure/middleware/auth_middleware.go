@@ -4,6 +4,7 @@ import (
 	"back/domain/service"
 	"back/infrastructure/repository"
 	"bytes"
+	"context"
 	"encoding/json"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -43,6 +44,17 @@ func AuthMiddleware(orm *gorm.DB, next echo.HandlerFunc) echo.HandlerFunc {
 		if !authService.ValidateToken(tokenString, repository.NewAccessTokenRepository(orm)) {
 			return echo.NewHTTPError(http.StatusUnauthorized, "認証が必要です")
 		}
+
+		authUser, err := repository.NewUserRepository(orm).FindByToken(tokenString)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusUnauthorized, "ユーザーの取得に失敗しました")
+		}
+		if authUser == nil {
+			return echo.NewHTTPError(http.StatusUnauthorized, "ユーザーが見つかりません")
+		}
+
+		ctx := context.WithValue(c.Request().Context(), "authUser", authUser)
+		c.SetRequest(c.Request().WithContext(ctx))
 
 		return next(c)
 	}
