@@ -15,6 +15,7 @@ func NewGroupRepository(orm *gorm.DB) repository.GroupRepository {
 	return &groupRepository{orm: orm}
 }
 
+// TODO: userIDは引数に必要か？ -> geに含める
 func (r *groupRepository) Create(ge *entity.GroupEntity, userID uint) (*entity.GroupEntity, error) {
 	var userModel model.UserModel
 

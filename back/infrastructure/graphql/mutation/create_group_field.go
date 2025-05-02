@@ -50,6 +50,7 @@ func CreateGroupField(orm *gorm.DB) *graphql.Field {
 
 			createGroupUsecase := usecase.NewCreateGroupUsecase(
 				repository.NewGroupRepository(orm),
+				repository.NewPointRepository(orm),
 			)
 			_, err := createGroupUsecase.Execute(entity.GroupEntity{
 				Name: name,
