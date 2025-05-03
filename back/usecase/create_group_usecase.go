@@ -7,23 +7,42 @@ import (
 )
 
 type createGroupUsecase struct {
-	groupRepository repository.GroupRepository
-	pointRepository repository.PointRepository
+	groupRepository       repository.GroupRepository
+	pointRepository       repository.PointRepository
+	transactionRepository repository.TransactionRepository
 }
 
 func NewCreateGroupUsecase(
 	groupRepository repository.GroupRepository,
 	pointRepository repository.PointRepository,
+	transactionRepository repository.TransactionRepository,
 ) *createGroupUsecase {
 	return &createGroupUsecase{
-		groupRepository: groupRepository,
-		pointRepository: pointRepository,
+		groupRepository:       groupRepository,
+		pointRepository:       pointRepository,
+		transactionRepository: transactionRepository,
 	}
 }
 
-// TODO: トランザクションを実装するべき
 func (u *createGroupUsecase) Execute(ge entity.GroupEntity, userID uint) (*entity.GroupEntity, *pkg.Error) {
-	groupEntity, err := u.groupRepository.Create(&ge, userID)
+	err := u.transactionRepository.ExecuteWith(func() error {
+		groupEntity, err := u.groupRepository.Create(&ge, userID)
+		if err != nil {
+			return err
+		}
+
+		pe := entity.PointEntity{
+			UserID:  userID,
+			GroupID: groupEntity.ID,
+		}
+		_, err = u.pointRepository.Create(&pe)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return nil, &pkg.Error{
 			Code:    400,
@@ -31,17 +50,5 @@ func (u *createGroupUsecase) Execute(ge entity.GroupEntity, userID uint) (*entit
 		}
 	}
 
-	pe := entity.PointEntity{
-		UserID:  userID,
-		GroupID: groupEntity.ID,
-	}
-	_, err = u.pointRepository.Create(&pe)
-	if err != nil {
-		return nil, &pkg.Error{
-			Code:    400,
-			Message: "ポイントの登録に失敗しました。",
-		}
-	}
-
-	return groupEntity, nil
+	return &ge, nil
 }
