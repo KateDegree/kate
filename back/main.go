@@ -3,6 +3,7 @@ package main
 import (
 	"back/infrastructure"
 	"back/infrastructure/graphql/mutation"
+	"back/infrastructure/graphql/query"
 	"back/infrastructure/middleware"
 	"back/pkg"
 	"github.com/graphql-go/graphql"
@@ -19,7 +20,7 @@ func main() {
 		Query: graphql.NewObject(graphql.ObjectConfig{
 			Name: "Query",
 			Fields: graphql.Fields{
-				"_dummy": &graphql.Field{Type: graphql.String},
+				"userGroups": query.UserGroupsField(orm),
 			},
 		}),
 		Mutation: graphql.NewObject(graphql.ObjectConfig{

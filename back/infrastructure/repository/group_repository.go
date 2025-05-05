@@ -40,3 +40,23 @@ func (r *groupRepository) Create(ge *entity.GroupEntity, userID uint) (*entity.G
 		Name: groupModel.Name,
 	}, nil
 }
+
+func (r *groupRepository) FindByUserID(userID uint) ([]*entity.GroupEntity, error) {
+	var user model.UserModel
+
+	if err := r.orm.Preload("Groups").First(&user, userID).Error; err != nil {
+		return nil, err
+	}
+
+	groupEntities := make([]*entity.GroupEntity, 0, len(user.Groups))
+	for _, gm := range user.Groups {
+		groupEntities = append(groupEntities, &entity.GroupEntity{
+			ID:        gm.ID,
+			Name:      gm.Name,
+			CreatedAt: gm.CreatedAt,
+			UpdatedAt: gm.UpdatedAt,
+		})
+	}
+
+	return groupEntities, nil
+}
