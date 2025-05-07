@@ -4,27 +4,27 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-var validate = validator.New()
+var vld = validator.New()
 
-func Validator(request any, messages map[string]map[string]string) []string {
-	err := validate.Struct(request)
+func Validate(input any, rules map[string]map[string]string) ([]string, bool) {
+	err := vld.Struct(input)
 	if err == nil {
-		return nil
+		return nil, true
 	}
 
 	ves, ok := err.(validator.ValidationErrors)
 	if !ok {
-		return []string{"エラーが発生しました。"}
+		return []string{"エラーが発生しました。"}, false
 	}
 
 	var msgs []string
 	for _, fe := range ves {
-		if tags, ok := messages[fe.Field()]; ok {
+		if tags, ok := rules[fe.Field()]; ok {
 			if msg, ok := tags[fe.Tag()]; ok {
 				msgs = append(msgs, msg)
 			}
 		}
 	}
 
-	return msgs
+	return msgs, false
 }

@@ -20,15 +20,16 @@ func main() {
 		Query: graphql.NewObject(graphql.ObjectConfig{
 			Name: "Query",
 			Fields: graphql.Fields{
-				"userGroups": query.UserGroupsField(orm),
+				"userGroups": query.UserGroupsQuery(orm),
 			},
 		}),
 		Mutation: graphql.NewObject(graphql.ObjectConfig{
 			Name: "Mutation",
 			Fields: graphql.Fields{
-				"login":       mutation.LoginField(orm),
-				"signUp":      mutation.SignUpField(orm),
-				"createGroup": mutation.CreateGroupField(orm),
+				"login":       mutation.LoginMutation(orm),
+				"signUp":      mutation.SignUpMutation(orm),
+				"createGroup": mutation.CreateGroupMutation(orm),
+				"updateGroup": mutation.UpdateGroupMutation(orm),
 			},
 		}),
 	})

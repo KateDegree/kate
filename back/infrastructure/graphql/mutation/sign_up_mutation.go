@@ -2,8 +2,8 @@ package mutation
 
 import (
 	"back/domain/entity"
+	"back/infrastructure/graphql/request"
 	"back/infrastructure/repository"
-	"back/interface/validator"
 	"back/usecase"
 	"github.com/graphql-go/graphql"
 	"gorm.io/gorm"
@@ -15,9 +15,9 @@ type SignUpResponse struct {
 	Messages    []string `json:"messages"`
 }
 
-func SignUpField(orm *gorm.DB) *graphql.Field {
+func SignUpMutation(orm *gorm.DB) *graphql.Field {
 	signUpResponseType := graphql.NewObject(graphql.ObjectConfig{
-		Name: "SignUpResponse",
+		Name: "SignUp",
 		Fields: graphql.Fields{
 			"accessToken": &graphql.Field{
 				Type: graphql.String,
@@ -44,18 +44,18 @@ func SignUpField(orm *gorm.DB) *graphql.Field {
 				Type: graphql.String,
 			},
 		},
-		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			name := p.Args["name"].(string)
-			accountCode := p.Args["accountCode"].(string)
-			password := p.Args["password"].(string)
-
-			errorMessages := validator.SignUpValidator(name, accountCode, password)
-			if len(errorMessages) > 0 {
+		Resolve: func(rp graphql.ResolveParams) (interface{}, error) {
+			signUpRequest := request.NewSignUpRequest(rp)
+			if !signUpRequest.IsValid {
 				return SignUpResponse{
 					Success:  false,
-					Messages: errorMessages,
+					Messages: signUpRequest.Messages,
 				}, nil
 			}
+
+			name := signUpRequest.Input.Name
+			accountCode := signUpRequest.Input.AccountCode
+			password := signUpRequest.Input.Password
 
 			signUpUsecase := usecase.NewSignUpUsecase(
 				repository.NewUserRepository(orm),
@@ -66,7 +66,6 @@ func SignUpField(orm *gorm.DB) *graphql.Field {
 				AccountCode: accountCode,
 				Password:    password,
 			})
-
 			if err != nil {
 				return SignUpResponse{
 					AccessToken: "",

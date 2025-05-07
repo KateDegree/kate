@@ -9,6 +9,7 @@ import (
 	"os/exec"
 )
 
+// TODO: 動かなくなったので、後で直す
 func main() {
 	if len(os.Args) < 2 {
 		FatalLog()

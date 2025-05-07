@@ -2,11 +2,10 @@ package mutation
 
 import (
 	"back/domain/entity"
+	"back/infrastructure/graphql/request"
 	"back/infrastructure/repository"
-	"back/interface/validator"
 	"back/usecase"
 	"github.com/graphql-go/graphql"
-	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
@@ -15,10 +14,10 @@ type CreateGroupResponse struct {
 	Messages []string `json:"messages"`
 }
 
-func CreateGroupField(orm *gorm.DB) *graphql.Field {
+func CreateGroupMutation(orm *gorm.DB) *graphql.Field {
 	return &graphql.Field{
 		Type: graphql.NewObject(graphql.ObjectConfig{
-			Name: "CreateGroupResponse",
+			Name: "CreateGroup",
 			Fields: graphql.Fields{
 				"success": &graphql.Field{
 					Type: graphql.Boolean,
@@ -33,20 +32,17 @@ func CreateGroupField(orm *gorm.DB) *graphql.Field {
 				Type: graphql.NewNonNull(graphql.String),
 			},
 		},
-		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			authUser, ok := p.Context.Value("authUser").(*entity.UserEntity)
-			if !ok || authUser == nil {
-				return nil, echo.NewHTTPError(401, "認証エラー: ユーザーが見つかりません")
-			}
-
-			name := p.Args["name"].(string)
-			errorMessages := validator.CreateGroupValidator(name)
-			if len(errorMessages) > 0 {
+		Resolve: func(rp graphql.ResolveParams) (interface{}, error) {
+			createGroupRequest := request.NewCreateGroupRequest(rp)
+			if !createGroupRequest.IsValid {
 				return CreateGroupResponse{
 					Success:  false,
-					Messages: errorMessages,
+					Messages: createGroupRequest.Messages,
 				}, nil
 			}
+
+			authUser := rp.Context.Value("authUser").(*entity.UserEntity)
+			name := createGroupRequest.Input.Name
 
 			createGroupUsecase := usecase.NewCreateGroupUsecase(
 				repository.NewGroupRepository(orm),

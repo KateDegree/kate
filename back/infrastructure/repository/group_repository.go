@@ -60,3 +60,34 @@ func (r *groupRepository) FindByUserID(userID uint) ([]*entity.GroupEntity, erro
 
 	return groupEntities, nil
 }
+
+func (r *groupRepository) Update(ge *entity.GroupEntity, userID uint) (*entity.GroupEntity, error) {
+	var user model.UserModel
+	if err := r.orm.Preload("Groups").First(&user, userID).Error; err != nil {
+		return nil, err
+	}
+
+	var groupModel *model.GroupModel
+	for _, group := range user.Groups {
+		if group.ID == ge.ID {
+			groupModel = &group
+			break
+		}
+	}
+
+	if groupModel == nil {
+		return nil, gorm.ErrRecordNotFound
+	}
+
+	groupModel.Name = ge.Name
+	if err := r.orm.Save(groupModel).Error; err != nil {
+		return nil, err
+	}
+
+	return &entity.GroupEntity{
+		ID:        groupModel.ID,
+		Name:      groupModel.Name,
+		CreatedAt: groupModel.CreatedAt,
+		UpdatedAt: groupModel.UpdatedAt,
+	}, nil
+}

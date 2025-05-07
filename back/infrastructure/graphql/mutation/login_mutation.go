@@ -2,8 +2,8 @@ package mutation
 
 import (
 	"back/domain/entity"
+	"back/infrastructure/graphql/request"
 	"back/infrastructure/repository"
-	"back/interface/validator"
 	"back/usecase"
 	"github.com/graphql-go/graphql"
 	"gorm.io/gorm"
@@ -15,9 +15,9 @@ type LoginResponse struct {
 	Messages    []string `json:"messages"`
 }
 
-func LoginField(orm *gorm.DB) *graphql.Field {
+func LoginMutation(orm *gorm.DB) *graphql.Field {
 	loginResponseType := graphql.NewObject(graphql.ObjectConfig{
-		Name: "LoginResponse",
+		Name: "Login",
 		Fields: graphql.Fields{
 			"accessToken": &graphql.Field{
 				Type: graphql.String,
@@ -41,18 +41,18 @@ func LoginField(orm *gorm.DB) *graphql.Field {
 				Type: graphql.String,
 			},
 		},
-		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			accountCode := p.Args["accountCode"].(string)
-			password := p.Args["password"].(string)
-
-			errorMessages := validator.LoginValidator(accountCode, password)
-			if len(errorMessages) > 0 {
+		Resolve: func(rp graphql.ResolveParams) (interface{}, error) {
+			loginRequest := request.NewLoginRequest(rp)
+			if !loginRequest.IsValid {
 				return LoginResponse{
 					AccessToken: "",
 					Success:     false,
-					Messages:    errorMessages,
+					Messages:    loginRequest.Messages,
 				}, nil
 			}
+
+			accountCode := loginRequest.Input.AccountCode
+			password := loginRequest.Input.Password
 
 			loginUsecase := usecase.NewLoginUsecase(
 				repository.NewUserRepository(orm),

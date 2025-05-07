@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func UserGroupsField(orm *gorm.DB) *graphql.Field {
+func UserGroupsQuery(orm *gorm.DB) *graphql.Field {
 	return &graphql.Field{
 		Type: graphql.NewList(graphql.NewObject(graphql.ObjectConfig{
 			Name: "UserGroups",
@@ -28,16 +28,12 @@ func UserGroupsField(orm *gorm.DB) *graphql.Field {
 				},
 			},
 		})),
-		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			authUser, ok := p.Context.Value("authUser").(*entity.UserEntity)
-			if !ok || authUser == nil {
-				return nil, echo.NewHTTPError(401, "認証エラー: ユーザーが見つかりません")
-			}
+		Resolve: func(rp graphql.ResolveParams) (interface{}, error) {
+			authUser := rp.Context.Value("authUser").(*entity.UserEntity)
 
 			userGroupsUsecase := usecase.NewGetUserGroupsUsecase(
 				repository.NewGroupRepository(orm),
 			)
-
 			groups, err := userGroupsUsecase.Execute(authUser.ID)
 			if err != nil {
 				return nil, echo.NewHTTPError(500, err.Message)
