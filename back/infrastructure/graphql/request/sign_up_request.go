@@ -1,7 +1,7 @@
 package request
 
 import (
-	"back/pkg"
+	"back/infrastructure/graphql/request/internal"
 	"github.com/graphql-go/graphql"
 )
 
@@ -39,7 +39,7 @@ func NewSignUpRequest(rp graphql.ResolveParams) *SignUpRequest {
 		},
 	}
 
-	msgs, ok := pkg.Validate(input, rules)
+	msgs, ok := internal.Validate(input, rules)
 	return &SignUpRequest{
 		Input:    input,
 		Messages: msgs,

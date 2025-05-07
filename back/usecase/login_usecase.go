@@ -4,7 +4,7 @@ import (
 	"back/domain/entity"
 	"back/domain/repository"
 	"back/domain/service"
-	"back/pkg"
+	"back/usecase/internal"
 )
 
 type loginUsecase struct {
@@ -23,16 +23,16 @@ type loginUsecaseResponse struct {
 	AccessToken string `json:"access_token"`
 }
 
-func (u *loginUsecase) Execute(ue entity.UserEntity) (*loginUsecaseResponse, *pkg.Error) {
+func (u *loginUsecase) Execute(ue entity.UserEntity) (*loginUsecaseResponse, *internal.UsecaseError) {
 	userEntity, err := u.userRepository.FindByAccountCode(ue.AccountCode)
 	if err != nil {
-		return nil, &pkg.Error{
+		return nil, &internal.UsecaseError{
 			Message: "ログイン処理中に問題が発生しました。時間をおいて再試行してください。",
 			Code:    500,
 		}
 	}
 	if userEntity == nil {
-		return nil, &pkg.Error{
+		return nil, &internal.UsecaseError{
 			Message: "メールアドレスまたはパスワードが正しくありません。",
 			Code:    400,
 		}
@@ -40,7 +40,7 @@ func (u *loginUsecase) Execute(ue entity.UserEntity) (*loginUsecaseResponse, *pk
 
 	err = service.NewAuthService().ValidatePassword(userEntity.Password, ue.Password)
 	if err != nil {
-		return nil, &pkg.Error{
+		return nil, &internal.UsecaseError{
 			Message: "メールアドレスまたはパスワードが正しくありません。",
 			Code:    400,
 		}
@@ -48,7 +48,7 @@ func (u *loginUsecase) Execute(ue entity.UserEntity) (*loginUsecaseResponse, *pk
 
 	accessTokenEntity, err := u.accessTokenRepository.Create(userEntity.ID)
 	if err != nil {
-		return nil, &pkg.Error{
+		return nil, &internal.UsecaseError{
 			Message: "ログイン処理中に問題が発生しました。時間をおいて再試行してください。",
 			Code:    500,
 		}

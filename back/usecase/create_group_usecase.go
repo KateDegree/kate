@@ -3,7 +3,7 @@ package usecase
 import (
 	"back/domain/entity"
 	"back/domain/repository"
-	"back/pkg"
+	"back/usecase/internal"
 )
 
 type createGroupUsecase struct {
@@ -24,7 +24,7 @@ func NewCreateGroupUsecase(
 	}
 }
 
-func (u *createGroupUsecase) Execute(ge entity.GroupEntity, userID uint) (*entity.GroupEntity, *pkg.Error) {
+func (u *createGroupUsecase) Execute(ge entity.GroupEntity, userID uint) (*entity.GroupEntity, *internal.UsecaseError) {
 	err := u.transactionRepository.ExecuteWith(func() error {
 		groupEntity, err := u.groupRepository.Create(&ge, userID)
 		if err != nil {
@@ -44,7 +44,7 @@ func (u *createGroupUsecase) Execute(ge entity.GroupEntity, userID uint) (*entit
 	})
 
 	if err != nil {
-		return nil, &pkg.Error{
+		return nil, &internal.UsecaseError{
 			Code:    400,
 			Message: "グループの登録に失敗しました。",
 		}

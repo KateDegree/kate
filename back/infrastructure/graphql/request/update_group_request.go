@@ -1,7 +1,7 @@
 package request
 
 import (
-	"back/pkg"
+	"back/infrastructure/graphql/request/internal"
 	"github.com/graphql-go/graphql"
 )
 
@@ -33,7 +33,7 @@ func NewUpdateGroupRequest(rp graphql.ResolveParams) *UpdateGroupRequest {
 		},
 	}
 
-	msgs, ok := pkg.Validate(input, rules)
+	msgs, ok := internal.Validate(input, rules)
 	return &UpdateGroupRequest{
 		Input:    input,
 		Messages: msgs,

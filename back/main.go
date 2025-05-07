@@ -5,14 +5,13 @@ import (
 	"back/infrastructure/graphql/mutation"
 	"back/infrastructure/graphql/query"
 	"back/infrastructure/middleware"
-	"back/pkg"
 	"github.com/graphql-go/graphql"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
 
 func main() {
-	pkg.LoadEnv()
+	LoadEnv()
 	orm := infrastructure.Gorm()
 
 	// スキーマ定義

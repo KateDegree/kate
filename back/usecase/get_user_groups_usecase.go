@@ -3,7 +3,7 @@ package usecase
 import (
 	"back/domain/entity"
 	"back/domain/repository"
-	"back/pkg"
+	"back/usecase/internal"
 )
 
 type getUserGroupsUsecase struct {
@@ -18,10 +18,10 @@ func NewGetUserGroupsUsecase(
 	}
 }
 
-func (u *getUserGroupsUsecase) Execute(userID uint) ([]entity.GroupEntity, *pkg.Error) {
+func (u *getUserGroupsUsecase) Execute(userID uint) ([]entity.GroupEntity, *internal.UsecaseError) {
 	groups, err := u.groupRepository.FindByUserID(userID)
 	if err != nil {
-		return nil, &pkg.Error{
+		return nil, &internal.UsecaseError{
 			Code:    500,
 			Message: "グループの取得に失敗しました",
 		}

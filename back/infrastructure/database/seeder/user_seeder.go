@@ -3,14 +3,13 @@ package main
 import (
 	"back/infrastructure"
 	"back/infrastructure/model"
-	"back/pkg"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 )
 
 func main() {
-	// .envファイルから環境変数を読み込む
-	pkg.LoadEnv()
+	// TODO: 環境変数の読み込み
+	LoadEnv()
 
 	plainPassword := "keito0418"
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
