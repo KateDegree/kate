@@ -9,15 +9,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type updateGroupResponse struct {
+type deleteGroupResponse struct {
 	Success  bool     `json:"success"`
 	Messages []string `json:"messages"`
 }
 
-func UpdateGroupMutation(orm *gorm.DB) *graphql.Field {
+func DeleteGroupMutation(orm *gorm.DB) *graphql.Field {
 	return &graphql.Field{
 		Type: graphql.NewObject(graphql.ObjectConfig{
-			Name: "updateGroup",
+			Name: "deleteGroup",
 			Fields: graphql.Fields{
 				"success": &graphql.Field{
 					Type: graphql.Boolean,
@@ -31,42 +31,33 @@ func UpdateGroupMutation(orm *gorm.DB) *graphql.Field {
 			"groupId": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.Int),
 			},
-			"name": &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.String),
-			},
 		},
 		Resolve: func(rp graphql.ResolveParams) (interface{}, error) {
-			updateGroupRequest := request.NewUpdateGroupRequest(rp)
-			if !updateGroupRequest.IsValid {
-				return updateGroupResponse{
+			deleteGroupRequest := request.NewDeleteGroupRequest(rp)
+			if !deleteGroupRequest.IsValid {
+				return deleteGroupResponse{
 					Success:  false,
-					Messages: updateGroupRequest.Messages,
+					Messages: deleteGroupRequest.Messages,
 				}, nil
 			}
 
 			authUser := rp.Context.Value("authUser").(*entity.UserEntity)
-			groupID := uint(updateGroupRequest.Input.GroupID)
-			name := updateGroupRequest.Input.Name
+			groupID := uint(deleteGroupRequest.Input.GroupID)
 
-			updateGroupUsecase := usecase.NewUpdateGroupUsecase(
+			deleteGroupUsecase := usecase.NewDeleteGroupUsecase(
 				repository.NewGroupRepository(orm),
 			)
-
-			ge := &entity.GroupEntity{
-				ID:   groupID,
-				Name: name,
-			}
-			_, err := updateGroupUsecase.Execute(ge, authUser.ID)
+			_, err := deleteGroupUsecase.Execute(groupID, authUser.ID)
 			if err != nil {
-				return updateGroupResponse{
+				return deleteGroupResponse{
 					Success:  false,
 					Messages: []string{err.Message},
 				}, nil
 			}
 
-			return updateGroupResponse{
+			return deleteGroupResponse{
 				Success:  true,
-				Messages: []string{"グループを更新しました"},
+				Messages: []string{"グループを削除しました。"},
 			}, nil
 		},
 	}

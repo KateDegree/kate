@@ -12,7 +12,7 @@ import (
 func UserGroupsQuery(orm *gorm.DB) *graphql.Field {
 	return &graphql.Field{
 		Type: graphql.NewList(graphql.NewObject(graphql.ObjectConfig{
-			Name: "UserGroups",
+			Name: "userGroups",
 			Fields: graphql.Fields{
 				"id": &graphql.Field{
 					Type: graphql.Int,

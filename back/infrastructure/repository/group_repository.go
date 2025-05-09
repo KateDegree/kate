@@ -90,3 +90,35 @@ func (r *groupRepository) Update(ge *entity.GroupEntity, userID uint) (*entity.G
 		UpdatedAt: groupModel.UpdatedAt,
 	}, nil
 }
+
+func (r *groupRepository) Delete(groupID uint, userID uint) (*entity.GroupEntity, error) {
+	var user model.UserModel
+	if err := r.orm.Preload("Groups").First(&user, userID).Error; err != nil {
+		return nil, err
+	}
+
+	var groupToDelete *model.GroupModel
+	for _, group := range user.Groups {
+		if group.ID == groupID {
+			groupToDelete = &group
+			break
+		}
+	}
+
+	if groupToDelete == nil {
+		return nil, gorm.ErrRecordNotFound
+	}
+
+	deletedEntity := &entity.GroupEntity{
+		ID:        groupToDelete.ID,
+		Name:      groupToDelete.Name,
+		CreatedAt: groupToDelete.CreatedAt,
+		UpdatedAt: groupToDelete.UpdatedAt,
+	}
+
+	if err := r.orm.Delete(&model.GroupModel{}, groupID).Error; err != nil {
+		return nil, err
+	}
+
+	return deletedEntity, nil
+}

@@ -17,7 +17,7 @@ type LoginResponse struct {
 
 func LoginMutation(orm *gorm.DB) *graphql.Field {
 	loginResponseType := graphql.NewObject(graphql.ObjectConfig{
-		Name: "Login",
+		Name: "login",
 		Fields: graphql.Fields{
 			"accessToken": &graphql.Field{
 				Type: graphql.String,

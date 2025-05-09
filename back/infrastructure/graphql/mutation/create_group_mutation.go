@@ -17,7 +17,7 @@ type CreateGroupResponse struct {
 func CreateGroupMutation(orm *gorm.DB) *graphql.Field {
 	return &graphql.Field{
 		Type: graphql.NewObject(graphql.ObjectConfig{
-			Name: "CreateGroup",
+			Name: "createGroup",
 			Fields: graphql.Fields{
 				"success": &graphql.Field{
 					Type: graphql.Boolean,

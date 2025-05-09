@@ -17,7 +17,7 @@ type SignUpResponse struct {
 
 func SignUpMutation(orm *gorm.DB) *graphql.Field {
 	signUpResponseType := graphql.NewObject(graphql.ObjectConfig{
-		Name: "SignUp",
+		Name: "signUp",
 		Fields: graphql.Fields{
 			"accessToken": &graphql.Field{
 				Type: graphql.String,
