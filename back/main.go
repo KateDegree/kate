@@ -30,6 +30,7 @@ func main() {
 				"createGroup": mutation.CreateGroupMutation(orm),
 				"updateGroup": mutation.UpdateGroupMutation(orm),
 				"deleteGroup": mutation.DeleteGroupMutation(orm),
+				"joinUser":    mutation.JoinUserMutation(orm),
 			},
 		}),
 	})

@@ -122,3 +122,26 @@ func (r *groupRepository) Delete(groupID uint, userID uint) (*entity.GroupEntity
 
 	return deletedEntity, nil
 }
+
+func (r *groupRepository) JoinUser(groupID uint, accountCode string, userID uint) (*entity.GroupEntity, error) {
+	var groupModel model.GroupModel
+	if err := r.orm.First(&groupModel, groupID).Error; err != nil {
+		return nil, err
+	}
+
+	var invitedUser model.UserModel
+	if err := r.orm.Where("account_code = ?", accountCode).First(&invitedUser).Error; err != nil {
+		return nil, err
+	}
+
+	if err := r.orm.Model(&invitedUser).Association("Groups").Append(&groupModel); err != nil {
+		return nil, err
+	}
+
+	return &entity.GroupEntity{
+		ID:        groupModel.ID,
+		Name:      groupModel.Name,
+		CreatedAt: groupModel.CreatedAt,
+		UpdatedAt: groupModel.UpdatedAt,
+	}, nil
+}

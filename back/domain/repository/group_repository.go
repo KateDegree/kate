@@ -9,4 +9,5 @@ type GroupRepository interface {
 	FindByUserID(userID uint) ([]*entity.GroupEntity, error)
 	Update(ge *entity.GroupEntity, userID uint) (*entity.GroupEntity, error)
 	Delete(groupID uint, userID uint) (*entity.GroupEntity, error)
+	JoinUser(groupID uint, accountCode string, userID uint) (*entity.GroupEntity, error)
 }
