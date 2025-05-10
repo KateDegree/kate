@@ -16,10 +16,10 @@ func NewGroupRepository(orm *gorm.DB) repository.GroupRepository {
 	return &groupRepository{orm: orm}
 }
 
-func (r *groupRepository) Create(ge *entity.GroupEntity, userID uint) (*entity.GroupEntity, error) {
+func (r *groupRepository) Create(ge *entity.GroupEntity, authID uint) (*entity.GroupEntity, error) {
 	var userModel model.UserModel
 
-	if err := r.orm.First(&userModel, userID).Error; err != nil {
+	if err := r.orm.First(&userModel, authID).Error; err != nil {
 		return nil, err
 	}
 
@@ -61,9 +61,9 @@ func (r *groupRepository) FindByUserID(userID uint) ([]*entity.GroupEntity, erro
 	return groupEntities, nil
 }
 
-func (r *groupRepository) Update(ge *entity.GroupEntity, userID uint) (*entity.GroupEntity, error) {
+func (r *groupRepository) Update(ge *entity.GroupEntity, authID uint) (*entity.GroupEntity, error) {
 	var user model.UserModel
-	if err := r.orm.Preload("Groups").First(&user, userID).Error; err != nil {
+	if err := r.orm.Preload("Groups").First(&user, authID).Error; err != nil {
 		return nil, err
 	}
 
@@ -92,9 +92,9 @@ func (r *groupRepository) Update(ge *entity.GroupEntity, userID uint) (*entity.G
 	}, nil
 }
 
-func (r *groupRepository) Delete(groupID uint, userID uint) (*entity.GroupEntity, error) {
+func (r *groupRepository) Delete(groupID uint, authID uint) (*entity.GroupEntity, error) {
 	var user model.UserModel
-	if err := r.orm.Preload("Groups").First(&user, userID).Error; err != nil {
+	if err := r.orm.Preload("Groups").First(&user, authID).Error; err != nil {
 		return nil, err
 	}
 
