@@ -31,8 +31,8 @@ func JoinUserMutation(orm *gorm.DB) *graphql.Field {
 			"groupId": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.Int),
 			},
-			"accountCode": &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.String),
+			"userId": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
 			},
 		},
 		Resolve: func(rp graphql.ResolveParams) (interface{}, error) {
@@ -46,10 +46,14 @@ func JoinUserMutation(orm *gorm.DB) *graphql.Field {
 
 			authUser := rp.Context.Value("authUser").(*entity.UserEntity)
 			groupID := uint(joinUserRequest.Input.GroupID)
-			accountCode := joinUserRequest.Input.AccountCode
+			userID := uint(joinUserRequest.Input.UserID)
 
-			joinUserUsecase := usecase.NewJoinUserUsecase(repository.NewGroupRepository(orm))
-			_, err := joinUserUsecase.Execute(groupID, accountCode, authUser.ID)
+			joinUserUsecase := usecase.NewJoinUserUsecase(
+				repository.NewGroupRepository(orm),
+				repository.NewPointRepository(orm),
+				repository.NewTransactionRepository(orm),
+			)
+			_, err := joinUserUsecase.Execute(groupID, userID, authUser.ID)
 			if err != nil {
 				return joinUserResponse{
 					Success:  false,

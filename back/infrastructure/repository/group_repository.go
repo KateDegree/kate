@@ -4,6 +4,7 @@ import (
 	"back/domain/entity"
 	"back/domain/repository"
 	"back/infrastructure/model"
+	"errors"
 	"gorm.io/gorm"
 )
 
@@ -123,14 +124,18 @@ func (r *groupRepository) Delete(groupID uint, userID uint) (*entity.GroupEntity
 	return deletedEntity, nil
 }
 
-func (r *groupRepository) JoinUser(groupID uint, accountCode string, userID uint) (*entity.GroupEntity, error) {
-	var groupModel model.GroupModel
-	if err := r.orm.First(&groupModel, groupID).Error; err != nil {
+func (r *groupRepository) LinkUser(groupID, userID, authID uint) (*entity.GroupEntity, error) {
+	var authUser model.UserModel
+	if err := r.orm.Preload("Groups", "id = ?", groupID).First(&authUser, authID).Error; err != nil {
 		return nil, err
 	}
+	if len(authUser.Groups) == 0 {
+		return nil, errors.New("指定された groupID は認証ユーザーに紐づいていません")
+	}
+	groupModel := authUser.Groups[0]
 
 	var invitedUser model.UserModel
-	if err := r.orm.Where("account_code = ?", accountCode).First(&invitedUser).Error; err != nil {
+	if err := r.orm.First(&invitedUser, userID).Error; err != nil {
 		return nil, err
 	}
 

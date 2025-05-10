@@ -6,8 +6,8 @@ import (
 )
 
 type joinUserInput struct {
-	GroupID     int    `validate:"required"`
-	AccountCode string `validate:"required"`
+	GroupID int `validate:"required"`
+	UserID  int `validate:"required"`
 }
 
 type JoinUserRequest struct {
@@ -18,16 +18,16 @@ type JoinUserRequest struct {
 
 func NewJoinUserRequest(rp graphql.ResolveParams) *JoinUserRequest {
 	input := &joinUserInput{
-		GroupID:     rp.Args["groupId"].(int),
-		AccountCode: rp.Args["accountCode"].(string),
+		GroupID: rp.Args["groupId"].(int),
+		UserID:  rp.Args["userId"].(int),
 	}
 
 	rules := map[string]map[string]string{
 		"GroupID": {
 			"required": "グループIDは必須です",
 		},
-		"AccountCode": {
-			"required": "アカウントコードは必須です",
+		"UserID": {
+			"required": "ユーザーIDは必須です",
 		},
 	}
 

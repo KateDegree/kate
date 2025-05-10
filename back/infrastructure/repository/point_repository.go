@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"back/domain/constant"
 	"back/domain/entity"
 	"back/domain/repository"
 	"back/infrastructure/model"
@@ -18,11 +19,10 @@ func NewPointRepository(orm *gorm.DB) repository.PointRepository {
 }
 
 func (r *pointRepository) Create(pe *entity.PointEntity) (*entity.PointEntity, error) {
-	const DEFAULT_POINT_AMOUNT = 12500
 	pm := &model.PointModel{
 		UserID:  pe.UserID,
 		GroupID: pe.GroupID,
-		Amount:  DEFAULT_POINT_AMOUNT,
+		Amount:  constant.DEFAULT_POINT_AMOUNT,
 	}
 
 	if err := r.orm.Create(pm).Error; err != nil {
@@ -38,8 +38,13 @@ func (r *pointRepository) Create(pe *entity.PointEntity) (*entity.PointEntity, e
 
 func (r *pointRepository) FindByUserAndGroup(pe *entity.PointEntity) (*entity.PointEntity, error) {
 	var pm model.PointModel
-	if err := r.orm.Where("user_id = ? AND group_id = ?", pe.UserID, pe.GroupID).First(&pm).Error; err != nil {
+	err := r.orm.Unscoped().Where("user_id = ? AND group_id = ?", pe.UserID, pe.GroupID).First(&pm).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, err
+	}
+
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
 	}
 
 	return &entity.PointEntity{
@@ -55,7 +60,7 @@ func (r *pointRepository) Restore(pe *entity.PointEntity) (*entity.PointEntity, 
 		GroupID: pe.GroupID,
 	}
 
-	if err := r.orm.Where("user_id = ? AND group_id = ?", pe.UserID, pe.GroupID).First(&pm).Error; err != nil {
+	if err := r.orm.Unscoped().Where("user_id = ? AND group_id = ?", pe.UserID, pe.GroupID).First(&pm).Error; err != nil {
 		return nil, err
 	}
 
